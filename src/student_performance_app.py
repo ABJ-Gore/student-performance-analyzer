@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def load_data(file_path):
     """
@@ -114,6 +115,37 @@ def compare_group_scores(df):
         print(f"  Writing Avg: {subset['writing_score'].mean():.2f}")
 
 
+# ---------------------------------------------
+# PART 4 — Visualization
+# ---------------------------------------------
+
+def plot_score_distribution(df):
+    """
+    Plots a histogram of scores for the selected subject.
+    """
+    print("\n===== SCORE DISTRIBUTION PLOT =====")
+    print("Available subjects:")
+    print("- math_score")
+    print("- reading_score")
+    print("- writing_score")
+
+    subject = input("Enter subject to plot: ").strip().lower().replace(" ", "_").replace("/", "_")
+
+    if subject not in df.columns:
+        print(f"Error: '{subject}' is not a valid subject.")
+        return
+
+    plt.figure()
+    plt.hist(df[subject].dropna(), bins=10)
+    plt.xlabel(subject.replace("_", " ").title())
+    plt.ylabel("Number of Students")
+    plt.title(f"Distribution of {subject.replace('_', ' ').title()}")
+    plt.show()
+
+# ----- End of Part 4 -----
+
+
+
 
 def main_menu(df):
     """
@@ -125,7 +157,8 @@ def main_menu(df):
         print("2. Show score statistics")
         print("3. Test preparation effect analysis")
         print("4. Compare scores by group")
-        print("5. Exit")
+        print("5. Plot score distribution")
+        print("6. Exit")
 
         choice = input("Enter choice: ").strip()
 
@@ -138,6 +171,8 @@ def main_menu(df):
         elif choice == "4":
             compare_group_scores(df)
         elif choice == "5":
+            plot_score_distribution(df)
+        elif choice == "6":
             print("Exiting program.")
             break
         else:
