@@ -1,6 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# =====================================================
+# PART 1 — Data Loading & Basic Exploration
+# Written by: Abhijay Gore
+# =====================================================
+
 def load_data(file_path):
     """
     Loads the student performance dataset from a CSV file.
@@ -11,9 +16,13 @@ def load_data(file_path):
         print("CSV file not found.")
         return None
 
-    # Clean column names so they are easier to work with
-    df.columns = [c.strip().lower().replace(" ", "_").replace("/", "_") for c in df.columns]
+    # Clean column names
+    df.columns = [
+        c.strip().lower().replace(" ", "_").replace("/", "_")
+        for c in df.columns
+    ]
     return df
+
 
 def show_basic_stats(df):
     """
@@ -30,29 +39,33 @@ def show_basic_stats(df):
     print("\nFirst 5 rows:")
     print(df.head())
 
-# ---------------------------------------------
-# PART 2 — Written by: Bella Gerken
-# Score statistics + test prep analysis
-# ---------------------------------------------
 
-def score_statistics(df):
+# =====================================================
+# PART 2 — Score Statistics & Correlation Analysis
+# Written by: Bella Gerken (Statistics)
+# Correlation added by: Abhijay Gore
+# =====================================================
+
+def score_statistics_and_correlation(df):
     """
-    Prints average, minimum, and maximum scores
-    for Math, Reading, and Writing subjects.
+    Prints score statistics and correlation between subjects.
     """
     print("\n===== SCORE STATISTICS =====")
 
     subjects = ["math_score", "reading_score", "writing_score"]
 
     for subject in subjects:
-        avg = df[subject].mean()
-        minimum = df[subject].min()
-        maximum = df[subject].max()
-
         print(f"\n--- {subject.replace('_',' ').title()} ---")
-        print(f"Average: {avg:.2f}")
-        print(f"Minimum: {minimum}")
-        print(f"Maximum: {maximum}")
+        print(f"Average: {df[subject].mean():.2f}")
+        print(f"Minimum: {df[subject].min()}")
+        print(f"Maximum: {df[subject].max()}")
+
+    print("\n===== SCORE CORRELATION =====")
+    corr = df[subjects].corr()
+    print(corr)
+
+    print("\nInterpretation:")
+    print("Reading and writing scores are strongly correlated, while math shows a slightly weaker relationship.")
 
 
 def test_prep_effect(df):
@@ -62,20 +75,21 @@ def test_prep_effect(df):
     """
     print("\n===== TEST PREPARATION EFFECT =====")
 
-    # Group by the 'test_preparation_course' column
-    prep_groups = df.groupby("test_preparation_course")[["math_score", "reading_score", "writing_score"]].mean()
+    prep_groups = df.groupby(
+        "test_preparation_course"
+    )[["math_score", "reading_score", "writing_score"]].mean()
 
     print("\nAverage Scores Based on Test Preparation:")
     print(prep_groups)
 
     print("\nInterpretation:")
-    print("Students who completed the test preparation course typically score higher.")
+    print("Students who completed the test preparation course generally score higher across all subjects.")
 
 
-# ----- End of Part 2 (Bella Gerken) -----
-# ---------------------------------------------
-# PART 3 — Group score comparison
-# ---------------------------------------------
+# =====================================================
+# PART 3 — Group Score Comparison
+# Written by: Eric Chisala
+# =====================================================
 
 def normalize_column_name(user_input):
     """
@@ -106,8 +120,7 @@ def compare_group_scores(df):
 
     print(f"\n--- Comparing scores by {group_col.replace('_', ' ').title()} ---")
 
-    groups = df[group_col].unique()
-    for g in groups:
+    for g in df[group_col].unique():
         subset = df[df[group_col] == g]
         print(f"\nGroup: {g}")
         print(f"  Math Avg:    {subset['math_score'].mean():.2f}")
@@ -115,9 +128,10 @@ def compare_group_scores(df):
         print(f"  Writing Avg: {subset['writing_score'].mean():.2f}")
 
 
-# ---------------------------------------------
+# =====================================================
 # PART 4 — Visualization
-# ---------------------------------------------
+# Written by: Takudzwa Musimwa
+# =====================================================
 
 def plot_score_distribution(df):
     """
@@ -129,10 +143,10 @@ def plot_score_distribution(df):
     print("- reading_score")
     print("- writing_score")
 
-    subject = input("Enter subject to plot: ").strip().lower().replace(" ", "_").replace("/", "_")
+    subject = input("Enter subject to plot: ").strip().lower().replace(" ", "_")
 
     if subject not in df.columns:
-        print(f"Error: '{subject}' is not a valid subject.")
+        print("Invalid subject.")
         return
 
     plt.figure()
@@ -142,19 +156,19 @@ def plot_score_distribution(df):
     plt.title(f"Distribution of {subject.replace('_', ' ').title()}")
     plt.show()
 
-# ----- End of Part 4 -----
 
-
-
+# =====================================================
+# MAIN MENU — User Interaction
+# =====================================================
 
 def main_menu(df):
     """
     Handles user interaction.
     """
     while True:
-        print("\n=== Student Exam Performance Analyzer ===")
+        print("\n=== Interactive Student Exam Performance Analyzer ===")
         print("1. Show basic dataset info")
-        print("2. Show score statistics")
+        print("2. Score statistics and correlation analysis")
         print("3. Test preparation effect analysis")
         print("4. Compare scores by group")
         print("5. Plot score distribution")
@@ -165,7 +179,7 @@ def main_menu(df):
         if choice == "1":
             show_basic_stats(df)
         elif choice == "2":
-            score_statistics(df)
+            score_statistics_and_correlation(df)
         elif choice == "3":
             test_prep_effect(df)
         elif choice == "4":
@@ -176,11 +190,18 @@ def main_menu(df):
             print("Exiting program.")
             break
         else:
-            print("Invalid choice.")
+            print("Invalid choice. Try again.")
+
+
+# =====================================================
+# PROGRAM ENTRY POINT
+# =====================================================
 
 if __name__ == "__main__":
     file_path = "StudentsPerformance.csv"
     df = load_data(file_path)
 
-    if df is not None:
+    if df is not None and not df.empty:
         main_menu(df)
+    else:
+        print("Failed to load dataset.")
